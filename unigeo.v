@@ -26,41 +26,6 @@
 
 Require Import UniMath.MoreFoundations.Propositions.
 
-Section Intro.
-
-Lemma P1: forall A B: UU, A = B -> B = A.
-Proof.
-  intros.
-  induction X.
-  apply idpath.
-Qed.
-
-(* ∀ A B:UU, ¬ (A = B) -> ¬ (B = A). *)
-
-Lemma P2: forall A B:UU , A != B -> B != A.
-Proof.
-  intros.
-  unfold neg in *.
-  intros.
-  apply X.
-  induction X0; apply idpath.
-Qed.
-
-Lemma hneg2: forall A B:UU, hneg(A = B) -> hneg(B = A).
-Proof.
-  intros.
-  apply P2.
-  apply X.
-Qed.
-
-
-Lemma P1BIS: forall A B : UU, A = B -> B = A.
-Proof.
-  apply @pathsinv0.
-Qed.
-
-End Intro.
-
 Section Axioms.
 
 Context {Point: UU}.
