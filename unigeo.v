@@ -4,11 +4,12 @@
    Experimental:
   
    Tarski's axioms and Makarios's versions.
+   Satz 2.1 Satz 2.2 Satz 2.3 Satz 2.4 Satz 2.5 Satz 2.8 Satz 2.11, Satz 2.12
    
    TODO:
+   0) Definition with ∥ ?
    1) Clean Code
    2) Context ?
-   3) Try Satz 2.1.
    4) Remove Context `{EQFOR: forall A B:Point, ∥A = B∥ -> A = B}. ?
    5) Context `{eqBet3: ∏ A B C D:Point, Bet A B C -> ∥ C = D ∥ -> Bet A B D} ?
       Context `{eqCong3: ∏ A B C D x:Point, Cong A B x D -> ∥ x = C ∥ -> Cong A B C D} ?
@@ -28,7 +29,7 @@ Require Import UniMath.MoreFoundations.Propositions.
 
 Section Axioms.
 
-Context {Point: UU}.
+Context {Point:hSet}.
 
 
 Context {Bet  : Point → Point → Point → hProp}.
@@ -207,7 +208,7 @@ End Axioms.
 (* TARSKI -> MAKARIOS *)
 Section TAR2MAK.
 
-Context {Point: UU}.
+Context {Point: hSet}.
 Context {Bet  : Point → Point → Point → hProp}.
 Context {Cong : Point → Point → Point → Point → hProp}.
 
@@ -236,7 +237,7 @@ End TAR2MAK.
 (* Makarios -> Tarski *)
 Section MAK2TAR.
 
-Context {Point: UU}.
+Context {Point: hSet}.
 Context {Bet  : Point → Point → Point → hProp}.
 Context {Cong : Point → Point → Point → Point → hProp}.
 Context `{eqBet3: ∏ A B C D:Point, Bet A B C -> ∥ C = D ∥ -> Bet A B D}.
@@ -406,3 +407,229 @@ Qed.
 
 End MAK2TAR.
 
+Section Satz_2.
+
+Context {Point: hSet}.
+Context {Bet  : Point → Point → Point → hProp}.
+Context {Cong : Point → Point → Point → Point → hProp}.
+
+Lemma Satz2_1: 
+(is_pseudo_reflexivity Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+∏ A B, Cong A B A B.
+Proof.
+  intros Pseudo_reflexivity Cong_inner_transitivity A B.
+  assert(Cong B A A B) by apply Pseudo_reflexivity.
+  eapply Cong_inner_transitivity with B A;auto.
+Qed.
+
+Lemma Satz2_1bis: 
+(is_segment_construction Bet Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+∏ A B, Cong A B A B.
+Proof.
+  intros Segment_construction Cong_inner_transitivity A B.
+  assert(∏ A B : Point, ∃ E : Point, Bet B A E ∧ Cong A E A B).
+  intros.
+  apply Segment_construction.
+  assert(∃ E : Point, Bet B A E ∧ Cong A E A B).
+  apply X. use X0. intros. destruct X1 as [E Z].
+  assert(Cong A E A B). apply Z.
+  eapply Cong_inner_transitivity with A E;auto.
+Qed.
+
+Lemma Satz2_2:
+(is_pseudo_reflexivity Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+∏ A B C D, Cong A B C D -> Cong C D A B.
+Proof.
+  intros Pseudo_reflexivity Cong_inner_transitivity A B C D H1.
+  assert(Cong A B A B).
+  apply Satz2_1. apply Pseudo_reflexivity. apply Cong_inner_transitivity.
+  eapply Cong_inner_transitivity with A B;auto.
+Qed.
+
+Lemma Satz2_2bis: 
+(is_segment_construction Bet Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+∏ A B C D, Cong A B C D -> Cong C D A B.
+Proof.
+  intros Segment_construction Cong_inner_transitivity A B C D H1.
+  assert(Cong A B A B).
+  apply Satz2_1bis. apply Segment_construction. apply Cong_inner_transitivity.
+  eapply Cong_inner_transitivity with A B;auto.
+Qed.
+
+
+Lemma Satz2_3:
+(is_pseudo_reflexivity Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+∏ A B C D E F, Cong A B C D -> Cong C D E F-> Cong A B E F.
+Proof.
+  intros Pseudo_reflexivity Cong_inner_transitivity A B C D E F H1 H2.
+  assert(Cong C D A B).
+  apply Satz2_2. apply Pseudo_reflexivity. apply Cong_inner_transitivity.
+  apply H1.
+  eapply Cong_inner_transitivity; eauto.
+Qed.
+
+Lemma Satz2_4:
+(is_pseudo_reflexivity Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+∏ A B C D, Cong A B C D -> Cong B A C D.
+Proof.
+  intros Pseudo_reflexivity Cong_inner_transitivity A B C D H1.
+  assert(Cong B A A B) by apply Pseudo_reflexivity.
+  apply Satz2_3 with A B. apply Pseudo_reflexivity. apply Cong_inner_transitivity.
+  apply X.
+  apply H1.
+Qed.
+
+Lemma Satz2_5:
+(is_pseudo_reflexivity Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+∏ A B C D, Cong A B C D -> Cong A B D C.
+Proof.
+  intros Pseudo_reflexivity Cong_inner_transitivity A B C D H1.
+  assert(Cong C D D C) by apply Pseudo_reflexivity.
+  apply Satz2_3 with C D. apply Pseudo_reflexivity. apply Cong_inner_transitivity.
+  apply H1.
+  apply X.
+Qed.
+
+Context `{eqCong2: ∏ A B C D x:Point, Cong A x C D -> ∥ x = B ∥ -> Cong A B C D}.
+Context `{EQFOR: forall A B:Point, ∥A = B∥ -> A = B}.
+
+(** !! eq001 == eq002 **)
+Lemma eq002: forall A B:Point, ∥A = B∥ -> ∥B = A∥.
+Proof.
+  intros.
+  apply hinhpr.
+  apply @pathsinv0.
+  assert( A = B -> B = A).
+  apply @pathsinv0.
+  apply EQFOR.
+  apply X.
+Qed.
+
+Lemma Satz2_8:
+(is_segment_construction Bet Cong) ->
+(is_cong_identity Cong) ->
+∏ A B, Cong A A B B.
+Proof.
+  intros Segment_construction Cong_identity A B.
+  assert(∏ A B : Point, ∃ E : Point, Bet A A E ∧ Cong A E B B).
+  intros.
+  apply Segment_construction.
+  assert(∃ E : Point, Bet A A E ∧ Cong A E B B).
+  apply X. use X0. intros. destruct X1 as [E Z].
+  assert(Cong A E B B). apply Z.
+  assert(∥ A = E ∥). eapply Cong_identity with B; auto.
+  apply eqCong2 with E;auto.
+  apply eq002;auto.
+Qed.
+
+Definition AFS (Bet  : Point → Point → Point → hProp)
+               (Cong : Point → Point → Point → Point → hProp)
+               (A B C D A' B' C' D':Point) :=
+  Bet A B C ∧ Bet A' B' C' ∧
+  Cong A B A' B' ∧ Cong B C B' C' ∧
+  Cong A D A' D' ∧ Cong B D B' D'.
+
+Lemma Satz2_11_lem: forall A B C D A' B' C' D',
+(is_five_segment Bet Cong) ->
+ (AFS Bet Cong) A B C D A' B' C' D' -> A != B -> Cong C D C' D'.
+Proof.
+  unfold AFS.
+  intros.
+  induction X0 as [P1 P2].
+  induction P2 as [P2 P3].
+  induction P3 as [P3 P4].
+  induction P4 as [P4 P5].
+  induction P5 as [P5 P6].
+  apply (X A A' B B');eauto.
+Qed.
+
+Context `{Decidable: forall A B:Point, decidable (∥A = B∥)}.
+Context `{eqCong3: ∏ A B C D x:Point, Cong A B x D -> ∥ x = C ∥ -> Cong A B C D}.
+Context `{eqCong1: ∏ A B C D x:Point, Cong x B C D -> ∥ x = A ∥ -> Cong A B C D}.
+Context `{eqCong1b: ∏ A B C D x:Point, Cong x B C D -> ∥ A = x ∥ -> Cong A B C D}.
+Context `{eqCong2b: ∏ A B C D x:Point, Cong A x C D -> ∥ B = x ∥ -> Cong A B C D}.
+
+Lemma Satz2_11: forall A B C A' B' C',
+(is_pseudo_reflexivity Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+(is_segment_construction Bet Cong) ->
+(is_cong_identity Cong) ->
+(is_five_segment Bet Cong) ->
+Bet A B C -> Bet A' B' C' -> Cong A B A' B' -> Cong B C B' C' ->
+Cong A C A' C'.
+Proof.
+  intros.
+  unfold decidable in Decidable.
+  induction Decidable with A B.
+  - assert(Cong A A A' A').
+    apply Satz2_8;eauto.
+    assert(Cong B A B' A').
+    apply Satz2_5. apply X. apply X0.
+    apply Satz2_4;auto.
+    assert(Cong A A A' B').
+    apply eqCong2b with B;eauto. 
+    assert(∥ A'= B'∥).
+    assert(Cong A' B' A A).
+    apply Satz2_2;eauto.
+    apply X2 in X11;auto.
+    assert(Cong A C B' C').
+    eapply eqCong1b;eauto.
+    apply Satz2_4;auto.
+    eapply eqCong3;eauto.
+  - assert(AFS Bet Cong A B C A A' B' C' A').
+    unfold AFS.
+    repeat split;auto.
+    apply Satz2_8;auto.
+    apply Satz2_4;auto.
+    apply Satz2_5;auto.
+    assert(Cong C A C' A').
+    apply Satz2_11_lem with A B A' B'; eauto.
+    apply weqnegtonegishinh.
+    apply b.
+    apply Satz2_4;auto.
+    apply Satz2_5;auto.
+Qed.
+
+Lemma Satz2_12: forall Q A:Point,
+(is_pseudo_reflexivity Cong) ->
+(is_cong_inner_transitivity Cong) -> 
+(is_segment_construction Bet Cong) ->
+(is_cong_identity Cong) ->
+(is_five_segment Bet Cong) ->
+Q != A -> 
+  (forall X1 X2 B C:Point, Bet Q A X1 ∧ Cong A X1 B C ∧ Bet Q A X2 ∧ Cong A X2 B C ->
+   ∥ X1 = X2 ∥).
+Proof.
+  intros Q A.
+  intros Pseudo_reflexivity Cong_inner_transitivity Segment_construction Cong_identity five_segment.
+  intros.
+  induction X0 as [H0 H1].
+  induction H1 as [H1 H2].
+  induction H2 as [H2 H3].
+  assert(Cong B C A X2).
+  apply Satz2_2;auto.
+  assert(Cong A X1 A X2).
+  apply Satz2_3 with B C;auto.
+  assert(Cong Q A Q A).
+  apply Satz2_1;auto.
+  assert(Cong A X1 A X1).
+  apply Satz2_1;auto.
+  assert(AFS Bet Cong Q A X1 X1 Q A X1 X2).
+  unfold AFS.
+  repeat split;auto.
+  apply Satz2_11 with A A;auto.
+  assert(Cong X1 X1 X1 X2).
+  eapply Satz2_11_lem;eauto.
+  assert(Cong X1 X2 X1 X1).
+  apply Satz2_2;auto.
+  apply Cong_identity with X1;auto.
+Qed.
+
+End Satz_2.
