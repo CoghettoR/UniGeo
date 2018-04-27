@@ -35,10 +35,6 @@ Qed.
 Lemma AA: forall A B:UU, A = B -> ∥ B = A ∥.
 Proof. intros. induction X. apply hinhpr. apply idpath. Qed.
 
-Create HintDb HA1.
-
-Hint Immediate eq000 eq001alpha: Hint1.
-
 Context {Point: UU}.
 
 Context {Bet  : Point → Point → Point → hProp}.
@@ -100,8 +96,7 @@ Proof.
   - apply H2.
 Qed.
 
-Lemma Lm1:
-(is_RE Cong) -> (is_TE Cong) -> (is_FS Bet Cong) -> (is_FS' Bet Cong).
+Lemma Lm1: (is_RE Cong) -> (is_TE Cong) -> (is_FS Bet Cong) -> (is_FS' Bet Cong).
 Proof.
   intros RE TE FS.
   unfold is_FS'.
@@ -110,10 +105,7 @@ Proof.
   assert(Cong C D D C). apply RE;auto. apply TE with C D. split;auto.
 Qed.
 
-Lemma cong_reflexivity: 
-(is_SC Bet Cong) ->
-(is_TE Cong) ->
-∏ A B, Cong A B A B.
+Lemma cong_reflexivity: (is_SC Bet Cong) -> (is_TE Cong) -> ∏ A B, Cong A B A B.
 Proof.
   intros SC TE A B.
   assert(∏ A B : Point, ∃ E : Point, Bet B A E ∧ Cong A E A B).
@@ -135,22 +127,22 @@ Proof.
   eapply TE. split. apply H1. eapply cong_reflexivity;auto.
 Qed.
 
-Lemma eq001: forall A B: Point, ∥A = B∥ -> ∥B = A∥.
-Proof with auto with Hint1. intros... Qed.
+(*Lemma eq001: forall A B: Point, ∥A = B∥ -> ∥B = A∥.
+Proof with auto with Hint1. intros... Qed.*)
 
 Lemma between_trivial : 
 (∏ A B C D:Point, Bet A B C × ∥ C = D ∥ -> Bet A B D) ->
 (is_SC Bet Cong) ->
 (is_IE Cong) ->
 forall A B : Point, Bet A B B.
-Proof.
+Proof. 
   intros eqBet3 SC IE A B.
   assert(∏ A B : Point, ∃ E : Point, Bet A B E ∧ Cong B E B B).
   intros. apply SC. 
   assert(∃ x : Point, Bet A B x ∧ Cong B x B B) by apply X. 
   use X0. intros. destruct X1 as [x H1].
   assert(Cong B x B B) by apply H1.
-  assert (∥x = B∥). apply IE in X1;auto. apply eq001;assumption.
+  assert (∥x = B∥). apply IE in X1;auto. apply eq001alpha;assumption.
   apply eqBet3 with x.
   split. apply H1. assumption.
 Qed.
@@ -236,7 +228,7 @@ Proof.
     assert (∥ A = B ∥). apply hinhpr. apply a.
     split.
     apply eqCong3 with A. split. apply cong_trivial_identity;auto. apply hinhpr. apply idpath.
-    apply eq001. assumption.
+    apply eq001alpha. assumption.
     apply hinhpr. apply @pathsinv0 in a;assumption.
   - assert(Bet B A A) by (eapply between_trivial;auto).
   apply cong_symmetry;auto.
@@ -473,7 +465,7 @@ Proof.
     apply Satz2_4;auto.
     assert(Cong C A B' C').
     apply Satz2_4;auto.
-    assert(∥ B'= A'∥). apply eq001. exact X8.
+    assert(∥ B'= A'∥). apply eq001alpha. exact X8.
     eapply eqCong3;auto. apply X10. assumption. 
   - assert(AFS Bet Cong A B C A A' B' C' A').
     unfold AFS.
