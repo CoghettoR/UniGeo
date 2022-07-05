@@ -2,7 +2,7 @@ Experimental:
 
 Adaptation of Tarski's geometry axioms in Unimath.
 
-unigeo.v: somes results verified ("sub/coq/bin/coqide -indices-matter -type-in-type -Q UniMath UniMath").
+unigeo.v: somes results verified ("sub/coq/bin/coqide -indices-matter -type-in-type -Q UniMath UniMath" or  coqide -indices-matter -type-in-type unigeo.v)
 
 Experimentations with UniMath:
 
