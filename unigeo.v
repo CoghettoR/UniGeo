@@ -1,4 +1,7 @@
-(* Roland Coghetto April 2018
+(* Roland Coghetto 
+roland.coghetto@cafr-msa2p.be
+(c) 2018-2022
+
    unigeo.v
 
    Experimental:
